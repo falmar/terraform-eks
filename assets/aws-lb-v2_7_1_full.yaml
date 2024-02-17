@@ -849,6 +849,21 @@ spec:
         app.kubernetes.io/component: controller
         app.kubernetes.io/name: aws-load-balancer-controller
     spec:
+      tolerations:
+        - key: node.k8s.lavieri.dev/group
+          operator: Equal
+          value: controllers
+          effect: NoSchedule
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node.k8s.lavieri.dev/group
+                    operator: In
+                    values:
+                      - controllers
+
       containers:
       - args:
         - --cluster-name=${CLUSTER_NAME}

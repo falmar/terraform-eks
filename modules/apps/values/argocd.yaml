@@ -14,7 +14,6 @@ global:
                 values:
                   - controllers
 
-
 configs:
   params:
     server.insecure: "true"

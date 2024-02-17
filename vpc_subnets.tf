@@ -15,6 +15,10 @@ resource "aws_subnet" "backend" {
     Name = "${local.project_name}-backend-${element(data.aws_availability_zones.available.names, count.index)}-${count.index}"
     "kubernetes.io/role/internal-elb" = "1"
   }
+
+  depends_on = [
+    aws_internet_gateway.main_gw
+  ]
 }
 
 # public subnet
@@ -34,4 +38,8 @@ resource "aws_subnet" "frontend" {
     Name = "${local.project_name}-frontend-${element(data.aws_availability_zones.available.names, count.index)}-${count.index}"
     "kubernetes.io/role/elb" = "1"
   }
+
+  depends_on = [
+    aws_internet_gateway.main_gw
+  ]
 }
