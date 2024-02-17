@@ -1,0 +1,38 @@
+operator:
+  replicas: 1
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                  - linux
+          - matchExpressions:
+              - key: node.k8s.lavieri.dev/group
+                operator: In
+                values:
+                  - controllers
+
+# K3s incompatible
+k8sServiceHost: ${KUBERNETES_SERVICE_HOST}
+
+kubeProxyReplacement: true
+
+eni:
+#  enabled: true
+  enabled: true
+ipam:
+  #mode: "cluster-pool"
+  mode: "eni"
+
+#routingMode: "tunnel"
+routingMode: "native"
+
+egressMasqueradeInterfaces: eth0
+
+#ipam:
+#  operator:
+#    # K3S compatible
+#    clusterPoolIPv4PodCIDRList: ["10.42.0.0/16"]

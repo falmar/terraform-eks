@@ -1,0 +1,26 @@
+controller:
+  service:
+    enabled: true
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+      service.beta.kubernetes.io/aws-load-balancer-type: external
+      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: instance
+      service.beta.kubernetes.io/aws-load-balancer-security-groups: ${PUBLIC_NLB_SG}
+    type: LoadBalancer
+    nodePorts:
+      http: 30080
+      https: 30443
+  tolerations:
+    - key: node.k8s.lavieri.dev/group
+      operator: Equal
+      value: controllers
+      effect: NoSchedule
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node.k8s.lavieri.dev/group
+                operator: In
+                values:
+                  - controllers

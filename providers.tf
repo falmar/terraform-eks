@@ -1,8 +1,24 @@
-provider "aws" {
-  region = "eu-west-1"
+data "aws_caller_identity" "current" {}
 
-  default_tags {}
+provider "aws" {
+  region = var.aws_region
+
+  default_tags {
+    tags = {
+      Project     = var.project_name
+      Environment = var.environment
+    }
+  }
 }
+provider "helm" {
+  kubernetes {
+    config_path = var.kubeconfig_path
+  }
+}
+provider "kubectl" {
+  config_path = var.kubeconfig_path
+}
+
 
 data "aws_availability_zones" "available" {
   state = "available"
@@ -11,8 +27,12 @@ data "aws_availability_zones" "available" {
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "~> 5.0"
+    }
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
     }
   }
   required_version = ">= 1.7"

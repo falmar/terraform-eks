@@ -16,7 +16,7 @@ resource "aws_default_security_group" "default" {
   }
 
   tags = {
-    Name = "default"
+    Name = "${local.project_name}-default"
   }
 }
 
@@ -53,7 +53,57 @@ resource "aws_security_group" "internet" {
   }
 
   tags = {
-    Name = "internet"
+    Name = "${local.project_name}-internet"
+  }
+}
+
+resource "aws_security_group" "public_nlb" {
+  vpc_id      = aws_vpc.main.id
+  description = "Allow inbound traffic to public NLB"
+
+  ingress {
+    protocol  = "TCP"
+    from_port = 80
+    to_port   = 80
+
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  ingress {
+    protocol  = "TCP"
+    from_port = 443
+    to_port   = 443
+
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  egress {
+    from_port = 0
+    protocol  = -1
+    to_port   = 0
+
+    cidr_blocks      = [aws_vpc.main.cidr_block]
+  }
+
+  tags = {
+    Name = "${local.project_name}-public-nlb"
+  }
+}
+
+resource "aws_security_group" "public_nlb_target" {
+  vpc_id      = aws_vpc.main.id
+  description = "Allow inbound traffic from public NLB to targets"
+
+  ingress {
+    protocol = -1
+    from_port = 0
+    to_port   = 0
+
+    security_groups = [aws_security_group.public_nlb.id]
+  }
+
+  tags = {
+    Name = "${local.project_name}-public-nlb-target"
   }
 }
 
@@ -72,6 +122,6 @@ resource "aws_security_group" "ssh-inbound" {
   }
 
   tags = {
-    Name = "ssh-inbound"
+    Name = "${local.project_name}-ssh-inbound"
   }
 }

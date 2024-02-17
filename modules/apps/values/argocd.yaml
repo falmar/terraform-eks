@@ -1,0 +1,32 @@
+global:
+  tolerations:
+    - key: node.k8s.lavieri.dev/group
+      operator: Equal
+      value: controllers
+      effect: NoSchedule
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node.k8s.lavieri.dev/group
+                operator: In
+                values:
+                  - controllers
+
+
+configs:
+  params:
+    server.insecure: "true"
+
+server:
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    ingressClassName: "nginx"
+    enabled: true
+    tls: false
+    hostname: argocd.lavieri.dev
+    path: /
