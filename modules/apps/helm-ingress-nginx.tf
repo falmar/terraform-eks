@@ -1,5 +1,5 @@
 resource "helm_release" "ingress_nginx" {
-  count = var.bootstrap ? 0 : 1
+  count = var.critical_apps ? 0 : 1
 
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"
@@ -14,5 +14,10 @@ resource "helm_release" "ingress_nginx" {
     }),
   ]
 
-  depends_on = [helm_release.cilium]
+  depends_on = [
+    helm_release.cilium,
+    kubectl_manifest.eks_elb_controller,
+    helm_release.cert_manager,
+    aws_eks_addon.main_coredns,
+  ]
 }

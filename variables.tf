@@ -7,6 +7,10 @@ variable "bootstrap" {
   type    = bool
   default = false
 }
+variable "critical_apps" {
+  type    = bool
+  default = false
+}
 variable "aws_region" {
   description = "The AWS region in which the resources are created"
   type        = string
@@ -16,7 +20,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "The name of the project"
   type        = string
-  default     = "eks-main"
+  default     = "lavieri"
 }
 variable "environment" {
   description = "The environment in which the resources are created"

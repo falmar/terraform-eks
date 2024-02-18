@@ -1,5 +1,5 @@
 resource "aws_key_pair" "debug" {
-  public_key = file("~/.ssh/id_rsa.pub")
+  public_key = file("./secrets/ssh/debug.pub")
   key_name = "${local.project_name}-debug"
 }
 
@@ -28,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "eks_main_AmazonEC2ContainerRegistryRe
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.eks_main_worker_node.name
 }
-resource "aws_iam_role_policy_attachment" "eks_main_AmazonEKSCNIPolicy" {
+resource "aws_iam_role_policy_attachment" "eks_node_AmazonEKSCNIPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
   role       = aws_iam_role.eks_main_worker_node.name
 }
@@ -37,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "eks_main_AmazonEKSCNIPolicy" {
 #  name               = "${local.project_name}-main-cni"
 #  assume_role_policy = data.aws_iam_policy_document.cni_assume_role.json
 #}
-#resource "aws_iam_role_policy_attachment" "main_AmazonEKSCNIPolicy" {
+#resource "aws_iam_role_policy_attachment" "main_cni_AmazonEKSCNIPolicy" {
 #  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 #  role       = "${aws_iam_role.eks_main_cni.name}"
 #}
@@ -48,7 +48,7 @@ resource "aws_iam_role_policy_attachment" "eks_main_AmazonEKSCNIPolicy" {
 #    principals {
 #      type        = "Federated"
 #      identifiers = [
-#        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${aws_eks_cluster.main.identity[0].oidc[0].issuer}"
+#        aws_iam_openid_connect_provider.main.arn
 #      ]
 #    }
 #
@@ -56,12 +56,12 @@ resource "aws_iam_role_policy_attachment" "eks_main_AmazonEKSCNIPolicy" {
 #
 #    condition {
 #      test     = "StringEquals"
-#      variable = "${aws_eks_cluster.main.identity[0].oidc[0].issuer}:sub"
+#      variable = "${replace(aws_iam_openid_connect_provider.main.url, "https://", "")}:sub"
 #      values   = ["system:serviceaccount:kube-system:aws-node"]
 #    }
 #    condition {
 #      test     = "StringEquals"
-#      variable = "${aws_eks_cluster.main.identity[0].oidc[0].issuer}:aud"
+#      variable = "${replace(aws_iam_openid_connect_provider.main.url, "https://", "")}:aud"
 #      values   = ["sts.amazonaws.com"]
 #    }
 #  }

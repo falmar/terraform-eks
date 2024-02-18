@@ -1,6 +1,8 @@
-resource "aws_eks_node_group" "controllers" {
+resource "aws_eks_node_group" "general" {
+  count = (var.bootstrap || var.critical_apps) ? 0 : 1
+
   cluster_name    = aws_eks_cluster.main.name
-  node_group_name = "controllers"
+  node_group_name = "general"
   node_role_arn   = aws_iam_role.eks_main_worker_node.arn
   subnet_ids      = aws_subnet.backend[*].id
 
@@ -8,9 +10,9 @@ resource "aws_eks_node_group" "controllers" {
   capacity_type = "SPOT"
 
   scaling_config {
-    desired_size = 2
-    max_size     = 5
-    min_size     = 2
+    desired_size = 1
+    max_size     = 2
+    min_size     = 1
   }
 
   instance_types = [
@@ -22,13 +24,8 @@ resource "aws_eks_node_group" "controllers" {
     value  = "true"
     effect = "NO_EXECUTE"
   }
-  taint {
-    key    = "node.k8s.lavieri.dev/group"
-    value  = "controllers"
-    effect = "NO_SCHEDULE"
-  }
   labels = {
-    "node.k8s.lavieri.dev/group" = "controllers"
+    "node.k8s.lavieri.dev/group" = "general"
   }
 
   update_config {
@@ -36,8 +33,8 @@ resource "aws_eks_node_group" "controllers" {
   }
 
   launch_template {
-    version = aws_launch_template.eks_controllers.latest_version
-    id      = aws_launch_template.eks_controllers.id
+    version = aws_launch_template.eks_general.latest_version
+    id      = aws_launch_template.eks_general.id
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
@@ -52,11 +49,12 @@ resource "aws_eks_node_group" "controllers" {
 #  value = aws_iam_role.eks_main_cni.name
 #}
 
-resource "aws_launch_template" "eks_controllers" {
-  name_prefix            = "${local.project_name}-controllers"
-  key_name = aws_key_pair.debug.key_name
+resource "aws_launch_template" "eks_general" {
+  name_prefix            = "${local.project_name}-general"
+  key_name               = aws_key_pair.debug.key_name
   vpc_security_group_ids = [
     aws_eks_cluster.main.vpc_config[0].cluster_security_group_id,
-    aws_security_group.internet.id
+    aws_security_group.internet.id,
+    aws_security_group.public_nlb_target.id
   ]
 }
