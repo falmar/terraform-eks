@@ -1,5 +1,5 @@
 module "apps" {
-  count = var.bootstrap ? 0 : 1
+  count = (var.bootstrap) ? 0 : 1
   source = "./modules/apps"
 
   critical_apps    = var.critical_apps
@@ -13,7 +13,6 @@ module "apps" {
   oidc_provider_url         = aws_iam_openid_connect_provider.main.url
 
   depends_on = [
-    aws_eks_cluster.main,
     null_resource.main_kubeconfig,
   ]
 }

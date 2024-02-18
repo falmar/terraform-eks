@@ -1,5 +1,5 @@
 resource "aws_eks_node_group" "storage" {
-  count = (var.bootstrap || var.critical_apps) ? 0 : 1
+  count = (var.bootstrap || !var.allow_nodes) ? 0 : 1
 
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "storage"
@@ -10,8 +10,8 @@ resource "aws_eks_node_group" "storage" {
   capacity_type = "SPOT"
 
   scaling_config {
-    desired_size = 1
-    max_size     = 2
+    desired_size = 3
+    max_size     = 3
     min_size     = 0
   }
 
@@ -27,7 +27,7 @@ resource "aws_eks_node_group" "storage" {
   taint {
     key    = "node.k8s.lavieri.dev/group"
     value  = "storage"
-    effect = "NO_EXECUTE"
+    effect = "NO_SCHEDULE"
   }
   labels = {
     "node.k8s.lavieri.dev/group" = "storage"

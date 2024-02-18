@@ -1,5 +1,5 @@
 #resource "helm_release" "argocd" {
-#  count = var.critical_apps ? 0 : 1
+#  count = var.critical_apps > 0 ? 0 : 1
 #
 #  repository = "https://argoproj.github.io/argo-helm"
 #  chart      = "argo-cd"

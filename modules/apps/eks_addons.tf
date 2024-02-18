@@ -1,5 +1,5 @@
 resource "time_sleep" "wait_cilium" {
-  count = var.critical_apps ? 0 : 1
+  count = var.critical_apps > 1 ? 0 : 1
 
   depends_on = [helm_release.cilium]
 
@@ -7,7 +7,7 @@ resource "time_sleep" "wait_cilium" {
 }
 
 resource "aws_eks_addon" "main_coredns" {
-  count = var.critical_apps ? 0 : 1
+  count = var.critical_apps > 1 ? 0 : 1
 
   cluster_name                = var.cluster_name
   addon_name                  = "coredns"

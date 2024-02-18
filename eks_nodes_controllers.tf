@@ -1,5 +1,5 @@
 resource "aws_eks_node_group" "controllers" {
-  count        = var.bootstrap ? 0 : 1
+  count = (var.bootstrap) ? 0 : 1
 
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "controllers"
@@ -10,7 +10,7 @@ resource "aws_eks_node_group" "controllers" {
   capacity_type = "SPOT"
 
   scaling_config {
-    desired_size = 1
+    desired_size = 2
     max_size     = 3
     min_size     = 0
   }
@@ -56,9 +56,17 @@ resource "aws_eks_node_group" "controllers" {
 
 resource "aws_launch_template" "eks_controllers" {
   name_prefix            = "${local.project_name}-controllers"
-  key_name = aws_key_pair.debug.key_name
+  key_name               = aws_key_pair.debug.key_name
   vpc_security_group_ids = [
     aws_eks_cluster.main.vpc_config[0].cluster_security_group_id,
     aws_security_group.internet.id
   ]
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size = 20
+      volume_type = "gp3"
+    }
+  }
 }

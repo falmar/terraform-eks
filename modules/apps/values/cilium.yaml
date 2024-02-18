@@ -15,10 +15,8 @@ operator:
                 values:
                   - controllers
 
-# K3s incompatible
-k8sServiceHost: ${KUBERNETES_SERVICE_HOST}
-
 kubeProxyReplacement: true
+k8sServiceHost: ${KUBERNETES_SERVICE_HOST}
 
 eni:
 #  enabled: true
@@ -31,8 +29,3 @@ ipam:
 routingMode: "native"
 
 egressMasqueradeInterfaces: eth0
-
-#ipam:
-#  operator:
-#    # K3S compatible
-#    clusterPoolIPv4PodCIDRList: ["10.42.0.0/16"]

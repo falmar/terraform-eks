@@ -8,9 +8,14 @@ variable "bootstrap" {
   default = false
 }
 variable "critical_apps" {
-  type    = bool
-  default = false
+  type    = number
+  default = 0
 }
+variable "allow_nodes" {
+  type = bool
+  default = true
+}
+
 variable "aws_region" {
   description = "The AWS region in which the resources are created"
   type        = string

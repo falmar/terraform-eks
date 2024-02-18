@@ -1,5 +1,5 @@
 resource "helm_release" "ingress_nginx" {
-  count = var.critical_apps ? 0 : 1
+  count = var.critical_apps > 1 ? 0 : 1
 
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"

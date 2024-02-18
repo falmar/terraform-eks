@@ -1,5 +1,5 @@
 resource "aws_eks_node_group" "general" {
-  count = (var.bootstrap || var.critical_apps) ? 0 : 1
+  count = (var.bootstrap || !var.allow_nodes) ? 0 : 1
 
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "general"
@@ -57,4 +57,12 @@ resource "aws_launch_template" "eks_general" {
     aws_security_group.internet.id,
     aws_security_group.public_nlb_target.id
   ]
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size = 20
+      volume_type = "gp3"
+    }
+  }
 }

@@ -34,14 +34,15 @@ data "aws_iam_policy_document" "lb_assume_role" {
 }
 
 data "kubectl_file_documents" "eks_elb_controller" {
-  count = var.critical_apps ? 0 : 1
+  count   = var.critical_apps > 1 ? 0 : 1
   content = templatefile("./modules/apps/assets/aws-lb-v2_7_1_full.yaml", {
     CLUSTER_NAME = var.cluster_name
   })
 }
 resource "kubectl_manifest" "eks_elb_controller" {
-  count     = var.critical_apps ? 0 : length(data.kubectl_file_documents.eks_elb_controller[0].documents)
-  yaml_body = element(data.kubectl_file_documents.eks_elb_controller[0].documents, count.index)
+  override_namespace = "kube-system"
+  count              = var.critical_apps > 1 ? 0 : length(data.kubectl_file_documents.eks_elb_controller[0].documents)
+  yaml_body          = element(data.kubectl_file_documents.eks_elb_controller[0].documents, count.index)
 
   depends_on = [
     aws_iam_role.eks_elb,
@@ -51,7 +52,8 @@ resource "kubectl_manifest" "eks_elb_controller" {
 }
 
 resource "kubectl_manifest" "eks_elb_sa" {
-  yaml_body = templatefile("./modules/apps/assets/aws-lb-sa.yaml", {
+  override_namespace = "kube-system"
+  yaml_body          = templatefile("./modules/apps/assets/aws-lb-sa.yaml", {
     ACCOUNT_ID = var.account_id,
     ROLE_NAME  = aws_iam_role.eks_elb.name
   })

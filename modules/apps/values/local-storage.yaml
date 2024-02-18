@@ -1,0 +1,23 @@
+tolerations:
+  - key: node.k8s.lavieri.dev/group
+    operator: Equal
+    value: storage
+    effect: NoSchedule
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node.k8s.lavieri.dev/group
+              operator: In
+              values:
+                - storage
+
+classes:
+  - name: ebs-ssds
+    hostDir: /mnt/ssds
+    volumeMode: Filesystem
+    fsType: xfs
+    blockCleanerCommand:
+      - "/scripts/shred.sh"
+      - "2"

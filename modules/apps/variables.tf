@@ -1,5 +1,5 @@
 variable "critical_apps" {
-  type = bool
+  type = number
 }
 
 variable "k8s_service_endpoint" {

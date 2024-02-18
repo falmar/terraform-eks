@@ -11,7 +11,7 @@ resource "kubectl_manifest" "cert_manager" {
 }
 
 resource "helm_release" "cert_manager" {
-  count = var.critical_apps ? 0 : 1
+  count = var.critical_apps > 1 ? 0 : 1
 
   repository       = "https://charts.jetstack.io"
   chart            = "cert-manager"

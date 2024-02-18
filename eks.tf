@@ -8,9 +8,7 @@ resource "aws_eks_cluster" "main" {
     endpoint_public_access  = true
     endpoint_private_access = true
 
-    security_group_ids = [
-      aws_security_group.internet.id,
-    ]
+    security_group_ids = []
   }
 
   access_config {
@@ -63,7 +61,7 @@ resource "null_resource" "main_kubeconfig" {
         mkdir -p ./secrets/kubeconfig
       fi
       if [ ! -f ./secrets/kubeconfig/main ]; then
-        aws eks update-kubeconfig --name ${aws_eks_cluster.main.name} --region ${var.aws_region} --role-arn ${aws_iam_role.eks_main_cluster.arn} --kubeconfig ./secrets/kubeconfig/main
+        aws eks update-kubeconfig --name ${aws_eks_cluster.main.name} --region ${var.aws_region} --kubeconfig ./secrets/kubeconfig/main
       fi
     EOT
   }
