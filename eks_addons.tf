@@ -1,5 +1,5 @@
 resource "aws_eks_addon" "main_kube_proxy" {
-  count        = var.bootstrap ? 1 : 0
+  count        = var.allow_addons ? 1 : 0
   cluster_name = aws_eks_cluster.main.name
   addon_name   = "kube-proxy"
   resolve_conflicts_on_create = "OVERWRITE"
@@ -12,7 +12,7 @@ resource "aws_eks_addon" "main_kube_proxy" {
   ]
 }
 resource "aws_eks_addon" "main_vpc_cni" {
-  count        = var.bootstrap ? 1 : 0
+  count        = var.allow_addons ? 1 : 0
   cluster_name = aws_eks_cluster.main.name
   addon_name   = "vpc-cni"
   resolve_conflicts_on_create = "OVERWRITE"

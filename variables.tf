@@ -15,6 +15,10 @@ variable "allow_nodes" {
   type = bool
   default = true
 }
+variable "allow_addons" {
+  type = bool
+  default = false
+}
 
 variable "aws_region" {
   description = "The AWS region in which the resources are created"
