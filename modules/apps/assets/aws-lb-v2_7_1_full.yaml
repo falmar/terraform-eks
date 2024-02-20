@@ -908,32 +908,6 @@ spec:
           defaultMode: 420
           secretName: aws-load-balancer-webhook-tls
 ---
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  labels:
-    app.kubernetes.io/name: aws-load-balancer-controller
-  name: aws-load-balancer-serving-cert
-  namespace: kube-system
-spec:
-  dnsNames:
-  - aws-load-balancer-webhook-service.kube-system.svc
-  - aws-load-balancer-webhook-service.kube-system.svc.cluster.local
-  issuerRef:
-    kind: Issuer
-    name: aws-load-balancer-selfsigned-issuer
-  secretName: aws-load-balancer-webhook-tls
----
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  labels:
-    app.kubernetes.io/name: aws-load-balancer-controller
-  name: aws-load-balancer-selfsigned-issuer
-  namespace: kube-system
-spec:
-  selfSigned: {}
----
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -1098,3 +1072,29 @@ webhooks:
     resources:
     - ingresses
   sideEffects: None
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  labels:
+    app.kubernetes.io/name: aws-load-balancer-controller
+  name: aws-load-balancer-serving-cert
+  namespace: kube-system
+spec:
+  dnsNames:
+    - aws-load-balancer-webhook-service.kube-system.svc
+    - aws-load-balancer-webhook-service.kube-system.svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: aws-load-balancer-selfsigned-issuer
+  secretName: aws-load-balancer-webhook-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  labels:
+    app.kubernetes.io/name: aws-load-balancer-controller
+  name: aws-load-balancer-selfsigned-issuer
+  namespace: kube-system
+spec:
+  selfSigned: {}

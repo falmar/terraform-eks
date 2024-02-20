@@ -13,11 +13,11 @@ resource "kubectl_manifest" "local_storage" {
 
 
 resource "helm_release" "local_storage" {
-  count = var.critical_apps > 0 ? 0 : 1
+  count = var.critical_apps > 1 ? 0 : 1
 
   repository       = "https://kubernetes-sigs.github.io/sig-storage-local-static-provisioner"
   chart            = "local-static-provisioner"
-  name             = "local-storage-provisioner"
+  name             = "local-static-provisioner"
   version          = "2.0.0"
   namespace        = "kube-system"
   create_namespace = true
