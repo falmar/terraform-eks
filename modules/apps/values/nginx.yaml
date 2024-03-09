@@ -5,11 +5,20 @@ controller:
       service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
       service.beta.kubernetes.io/aws-load-balancer-type: external
       service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: instance
+      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "60"
+      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
       service.beta.kubernetes.io/aws-load-balancer-security-groups: ${PUBLIC_NLB_SG}
+      service.beta.kubernetes.io/aws-load-balancer-target-node-labels: "node.k8s.lavieri.dev/group=controllers"
+#      service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: "HTTP"
+#      service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: "/healthz"
+      service.beta.kubernetes.io/aws-load-balancer-healthcheck-port: "30843"
     type: LoadBalancer
     nodePorts:
       http: 30080
       https: 30443
+    externalTrafficPolicy: Local
+    healthCheckNodePort: 30843
   tolerations:
     - key: node.k8s.lavieri.dev/group
       operator: Equal
@@ -24,6 +33,7 @@ controller:
                 operator: In
                 values:
                   - controllers
+
   admissionWebhooks:
     patch:
       tolerations:
@@ -41,6 +51,9 @@ controller:
                     values:
                       - controllers
 defaultBackend:
+  enabled: false
+  image:
+    image: defaultbackend-arm64
   tolerations:
     - key: node.k8s.lavieri.dev/group
       operator: Equal

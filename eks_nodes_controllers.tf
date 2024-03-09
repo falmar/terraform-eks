@@ -59,7 +59,8 @@ resource "aws_launch_template" "eks_controllers" {
   key_name               = aws_key_pair.debug.key_name
   vpc_security_group_ids = [
     aws_eks_cluster.main.vpc_config[0].cluster_security_group_id,
-    aws_security_group.internet.id
+    aws_security_group.internet.id,
+    aws_security_group.public_nlb_target.id, // TODO: testing Nginx Ingress with NLB
   ]
 
   block_device_mappings {

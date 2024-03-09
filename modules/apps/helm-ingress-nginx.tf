@@ -16,7 +16,7 @@ resource "helm_release" "ingress_nginx" {
 
   depends_on = [
     helm_release.cilium,
-    kubectl_manifest.eks_elb_controller,
+    helm_release.aws_lb_controller,
     helm_release.cert_manager,
     aws_eks_addon.main_coredns,
   ]

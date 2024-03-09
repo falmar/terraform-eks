@@ -1,0 +1,26 @@
+createIngressClassResource: false
+
+clusterName: ${CLUSTER_NAME}
+
+serviceAccount:
+  create: true
+  name: aws-load-balancer-controller
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME}
+
+replicaCount: 1
+
+tolerations:
+  - key: node.k8s.lavieri.dev/group
+    operator: Equal
+    value: controllers
+    effect: NoSchedule
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node.k8s.lavieri.dev/group
+              operator: In
+              values:
+                - controllers

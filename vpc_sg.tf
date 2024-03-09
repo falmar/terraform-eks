@@ -95,9 +95,23 @@ resource "aws_security_group" "public_nlb_target" {
   description = "Allow inbound traffic from public NLB to targets"
 
   ingress {
-    protocol = -1
-    from_port = 0
-    to_port   = 0
+    protocol = "TCP"
+    from_port = 30080
+    to_port   = 30080
+
+    security_groups = [aws_security_group.public_nlb.id]
+  }
+  ingress {
+    protocol = "TCP"
+    from_port = 30443
+    to_port   = 30443
+
+    security_groups = [aws_security_group.public_nlb.id]
+  }
+  ingress {
+    protocol = "TCP"
+    from_port = 30843
+    to_port   = 30843
 
     security_groups = [aws_security_group.public_nlb.id]
   }

@@ -67,8 +67,8 @@ resource "null_resource" "main_kubeconfig" {
   }
   depends_on = [
     aws_eks_cluster.main,
-    aws_eks_access_policy_association.eks_user_access_admin,
-    aws_eks_access_policy_association.eks_user_access_cluster,
+    aws_eks_access_policy_association.eks_terraform_access_admin,
+    aws_eks_access_policy_association.eks_terraform_access_cluster,
   ]
 }
 
@@ -77,7 +77,7 @@ resource "aws_eks_access_entry" "eks_terraform_access" {
   principal_arn = data.aws_caller_identity.current.arn
   type          = "STANDARD"
 }
-resource "aws_eks_access_policy_association" "eks_user_access_admin" {
+resource "aws_eks_access_policy_association" "eks_terraform_access_admin" {
   cluster_name  = aws_eks_cluster.main.name
   principal_arn = data.aws_caller_identity.current.arn
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
@@ -86,9 +86,34 @@ resource "aws_eks_access_policy_association" "eks_user_access_admin" {
     type = "cluster"
   }
 }
-resource "aws_eks_access_policy_association" "eks_user_access_cluster" {
+resource "aws_eks_access_policy_association" "eks_terraform_access_cluster" {
   cluster_name  = aws_eks_cluster.main.name
   principal_arn = data.aws_caller_identity.current.arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+}
+
+# TODO: improve this to avoid root access, usually for easier testing
+resource "aws_eks_access_entry" "eks_root_access" {
+  cluster_name  = aws_eks_cluster.main.name
+  principal_arn = "${split("user/", data.aws_caller_identity.current.arn)[0]}root"
+  type          = "STANDARD"
+}
+resource "aws_eks_access_policy_association" "eks_root_access_admin" {
+  cluster_name  = aws_eks_cluster.main.name
+  principal_arn = "${split("user/", data.aws_caller_identity.current.arn)[0]}root"
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+}
+resource "aws_eks_access_policy_association" "eks_root_access_cluster" {
+  cluster_name  = aws_eks_cluster.main.name
+  principal_arn = "${split("user/", data.aws_caller_identity.current.arn)[0]}root"
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
 
   access_scope {
