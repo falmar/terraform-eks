@@ -51,6 +51,11 @@ resource "aws_iam_openid_connect_provider" "main" {
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = [data.tls_certificate.main.certificates[0].sha1_fingerprint]
   url             = data.tls_certificate.main.url
+
+  depends_on = [
+    aws_eks_cluster.main,
+    data.tls_certificate.main
+  ]
 }
 
 # add local exec to generate kubeconfig on path ./secrets/kubeconfig/main
@@ -76,6 +81,10 @@ resource "aws_eks_access_entry" "eks_terraform_access" {
   cluster_name  = aws_eks_cluster.main.name
   principal_arn = data.aws_caller_identity.current.arn
   type          = "STANDARD"
+
+  depends_on = [
+    aws_iam_openid_connect_provider.main
+  ]
 }
 resource "aws_eks_access_policy_association" "eks_terraform_access_admin" {
   cluster_name  = aws_eks_cluster.main.name
@@ -85,6 +94,11 @@ resource "aws_eks_access_policy_association" "eks_terraform_access_admin" {
   access_scope {
     type = "cluster"
   }
+
+  depends_on = [
+    aws_eks_access_entry.eks_terraform_access,
+    aws_iam_openid_connect_provider.main
+  ]
 }
 resource "aws_eks_access_policy_association" "eks_terraform_access_cluster" {
   cluster_name  = aws_eks_cluster.main.name
@@ -94,6 +108,11 @@ resource "aws_eks_access_policy_association" "eks_terraform_access_cluster" {
   access_scope {
     type = "cluster"
   }
+
+  depends_on = [
+    aws_eks_access_entry.eks_terraform_access,
+    aws_iam_openid_connect_provider.main
+  ]
 }
 
 # TODO: improve this to avoid root access, usually for easier testing
@@ -101,6 +120,10 @@ resource "aws_eks_access_entry" "eks_root_access" {
   cluster_name  = aws_eks_cluster.main.name
   principal_arn = "${split("user/", data.aws_caller_identity.current.arn)[0]}root"
   type          = "STANDARD"
+
+  depends_on = [
+    aws_iam_openid_connect_provider.main
+  ]
 }
 resource "aws_eks_access_policy_association" "eks_root_access_admin" {
   cluster_name  = aws_eks_cluster.main.name
@@ -110,6 +133,11 @@ resource "aws_eks_access_policy_association" "eks_root_access_admin" {
   access_scope {
     type = "cluster"
   }
+
+  depends_on = [
+    aws_eks_access_entry.eks_root_access,
+    aws_iam_openid_connect_provider.main
+  ]
 }
 resource "aws_eks_access_policy_association" "eks_root_access_cluster" {
   cluster_name  = aws_eks_cluster.main.name
@@ -119,4 +147,9 @@ resource "aws_eks_access_policy_association" "eks_root_access_cluster" {
   access_scope {
     type = "cluster"
   }
+
+  depends_on = [
+    aws_eks_access_entry.eks_root_access,
+    aws_iam_openid_connect_provider.main
+  ]
 }

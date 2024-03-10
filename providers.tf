@@ -18,7 +18,9 @@ provider "helm" {
 provider "kubectl" {
   config_path = var.kubeconfig_path
 }
-
+provider "kustomization" {
+  kubeconfig_path = var.kubeconfig_path
+}
 
 data "aws_availability_zones" "available" {
   state = "available"
@@ -31,8 +33,12 @@ terraform {
       version = "~> 5.0"
     }
     kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = "~> 1.0"
+     source  = "alekc/kubectl"
+      version = "~> 2.0"
+    }
+    kustomization = {
+      source  = "kbst/kustomization"
+      version = "0.9.0"
     }
   }
   required_version = ">= 1.7"

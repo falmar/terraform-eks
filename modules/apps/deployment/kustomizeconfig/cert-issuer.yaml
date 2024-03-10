@@ -1,0 +1,7 @@
+nameReference:
+  - kind: Secret
+    fieldSpecs:
+    - kind: ClusterIssuer
+      version: v1
+      group: cert-manager.io
+      path: spec/acme/solvers/dns01/cloudflare/apiTokenSecretRef/name

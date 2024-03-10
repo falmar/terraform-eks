@@ -1,4 +1,5 @@
 global:
+  domain: argocd.lavieri.dev
   tolerations:
     - key: node.k8s.lavieri.dev/group
       operator: Equal
@@ -16,16 +17,22 @@ global:
 
 configs:
   params:
-    server.insecure: "true"
+    server.insecure: true
 
 server:
   ingress:
     annotations:
       kubernetes.io/ingress.class: "nginx"
-      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      external-dns.alpha.kubernetes.io/hostname: argocd.lavieri.dev
+      cert-manager.io/cluster-issuer: "letsencrypt-lavieri-dev"
+      nginx.ingress.kubernetes.io/ssl-redirect: true
       nginx.ingress.kubernetes.io/backend-protocol: HTTP
     ingressClassName: "nginx"
     enabled: true
     tls: false
     hostname: argocd.lavieri.dev
     path: /
+    extraTls:
+      - secretName: argocd.lavieri.dev
+        hosts:
+          - argocd.lavieri.dev
